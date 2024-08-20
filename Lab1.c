@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     // Inicializa o vetor
     for (int i = 0; i < N; i++) {
-        vetor[i] = i;
+        vetor[i] = i; // Inicializa com valores de 0 a N-1
     }
 
     // Cria as threads
@@ -81,11 +81,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Imprime o vetor final
+    /*
     printf("Vetor final: ");
     for (int i = 0; i < N; i++) {
         printf("%d ", vetor[i]);
     }
     printf("\n");
+    */
 
     // Libera a memória alocada
     free(vetor);
