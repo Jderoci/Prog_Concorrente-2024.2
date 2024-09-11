@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     pthread_t *tid;
     double inicio, fim, delta;
 
+    GET_TIME(inicio);
     if (argc < 5) {
         puts("A entrada deve ser do tipo: ./concorrente <mat1> <mat2> <saida> <threads>");
         return 1;
@@ -85,7 +86,13 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < dim1 * dim3; i++) {
         sai[i] = 0;
     }
+   
+    GET_TIME(fim);
+    delta = fim - inicio;
+    printf("Tempo de inicializacao (concorrente):%lf\n", delta);
 
+    GET_TIME(inicio);
+    
     // Alocação das threads
     tid = (pthread_t*) malloc(nthreads * sizeof(pthread_t));
     id = (int*) malloc(nthreads * sizeof(int));
@@ -93,8 +100,7 @@ int main(int argc, char* argv[]) {
         printf("Erro -- malloc\n");
         return 2;
     }
-
-    GET_TIME(inicio);
+    
     // Criação das threads
     for (int i = 0; i < nthreads; i++) {
         id[i] = i;
@@ -111,17 +117,21 @@ int main(int argc, char* argv[]) {
     GET_TIME(fim);
 
     delta = fim - inicio;
-    printf("Tempo multiplicação (concorrente): %lf\n", delta);
+    printf("Tempo de processamento (concorrente): %lf\n", delta);
 
     // Salvar a matriz de saída
     salva_matriz_bin(argv[3], sai, dim1, dim3);
 
     // Liberação de memória
+    GET_TIME(inicio);
     free(mat1);
     free(mat2);
     free(sai);
     free(tid);
     free(id);
+    GET_TIME(fim)   
+    delta = fim - inicio;
+    printf("Tempo de finalizacao (concorrente):%lf\n", delta);
 
     return 0;
 }
