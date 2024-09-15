@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<pthread.h>
 #include "timer.h"
 
 float *mat1;
@@ -43,7 +42,7 @@ void salva_matriz_bin(char *arquivo, float *matriz, int linhas, int colunas) {
     fclose(f);
 }
 
-// Função de multiplicação de matrizes (versão sequencial)
+// Função que realiza a multiplicação de matrizes de forma sequencial
 void mult_matriz_sequencial() {
     for (int i = 0; i < dim1; i++) {
         for (int j = 0; j < dim3; j++) {
@@ -57,6 +56,7 @@ void mult_matriz_sequencial() {
 int main(int argc, char* argv[]) {
     double inicio, fim, delta;
 
+    GET_TIME(inicio);
     if (argc < 4) {
         puts("A entrada deve ser do tipo: ./sequencial <mat1> <mat2> <saida>");
         return 1;
@@ -78,22 +78,30 @@ int main(int argc, char* argv[]) {
         sai[i] = 0;
     }
 
-    GET_TIME(inicio);
-    // Multiplicação das matrizes
-    mult_matriz_sequencial();
     GET_TIME(fim);
-
     delta = fim - inicio;
-    printf("Tempo multiplicação (sequencial): %lf\n", delta);
+    printf("Tempo de inicializacao (sequencial): %lf\n", delta);
+
+    GET_TIME(inicio);
+    
+    // Multiplicação de matrizes de forma sequencial
+    mult_matriz_sequencial();
+
+    GET_TIME(fim);
+    delta = fim - inicio;
+    printf("Tempo de processamento (sequencial): %lf\n", delta);
 
     // Salvar a matriz de saída
     salva_matriz_bin(argv[3], sai, dim1, dim3);
 
     // Liberação de memória
+    GET_TIME(inicio);
     free(mat1);
     free(mat2);
     free(sai);
+    GET_TIME(fim);
+    delta = fim - inicio;
+    printf("Tempo de finalizacao (sequencial): %lf\n", delta);
 
     return 0;
 }
-
