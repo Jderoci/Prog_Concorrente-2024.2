@@ -103,5 +103,5 @@ int main(int argc, char* argv[]) {
     delta = fim - inicio;
     printf("Tempo de finalizacao (sequencial): %lf\n", delta);
 
-    return 0
+    return 0;
 }
