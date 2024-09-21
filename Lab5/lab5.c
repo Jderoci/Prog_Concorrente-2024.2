@@ -24,8 +24,8 @@ void *ExecutaTarefa(void *arg) {
 
     // Verificando se 'soma' é múltiplo de 10 e se é um novo múltiplo
     if (soma % 10 == 0 && soma / 10 > cont) {
-      pthread_cond_signal(&cond);       // Sinaliza a thread extra
-      pthread_cond_wait(&cond, &mutex); // Espera a thread extra imprimir
+      pthread_cond_signal(&cond);       // Sinaliza a thread Extra
+      pthread_cond_wait(&cond, &mutex); // Espera a thread Extra imprimir
     }
 
     pthread_mutex_unlock(&mutex);
