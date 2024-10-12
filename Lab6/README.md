@@ -6,7 +6,7 @@ A prioridade para operações de escrita é garantida pelo bloqueio dos leitores
 ![Log](log.png)
 
 ### Funcionamento do Sistema
-Podemos observar o comportamento do sistema no log gerado durante a execução com **16 threads** com ajustes na distribuição das operações de 80% para operações de leitura e 20% para escrita (divididas igualmente entre inserção e remoção). Abaixo estão alguns pontos que destacam a prioridade para escritores:
+Podemos observar o comportamento do sistema no log gerado durante a execução com **16 threads** com ajustes na distribuição das operações de **80% para operações de leitura e 20% para escrita** (divididas igualmente entre inserção e remoção). Abaixo estão alguns pontos que destacam a prioridade para escritores:
 
 *1.* Quando um leitor tenta acessar o recurso enquanto há escritores ativos ou aguardando, ele entra em espera. 
 
