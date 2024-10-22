@@ -17,4 +17,4 @@ int main() {
 
     finalizar_sincronizacao();
     return 0;
-
+}
