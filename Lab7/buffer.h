@@ -4,12 +4,14 @@
 #include <pthread.h>
 #include <semaphore.h>
 
-#define N 500              
-#define BUFFER_SIZE 1000
+#define N 500 
+#define BUFFER_SIZE 1000 
 
-// Buffers e variáveis globais
+// Buffers e variáveis globais para controle
 extern char buffer1[N];
 extern char buffer2[BUFFER_SIZE];
+extern int leitura_concluida; // Flag para indicar fim da leitura
+extern int count1, count2;    // Contadores para controle de processamento
 
 // Semáforos
 extern sem_t sem_buffer1_vazio, sem_buffer2_vazio;
