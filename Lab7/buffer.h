@@ -10,6 +10,8 @@
 // Buffers e variáveis globais
 extern char buffer1[N];
 extern char buffer2[BUFFER_SIZE];
+
+// Semáforos
 extern sem_t sem_buffer1_vazio, sem_buffer2_vazio;
 extern sem_t sem_buffer1_pronto, sem_buffer2_pronto;
 
