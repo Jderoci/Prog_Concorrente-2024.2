@@ -1,18 +1,12 @@
+#include "buffer.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include "sincronizacao.h"
+#include <string.h>
 
-#define N 500
-#define BUFFER_SIZE 1000
-
-// Buffers e variáveis de controle
 char buffer1[N];
 char buffer2[BUFFER_SIZE];
-int leitura_concluida = 0;
-int count1 = 0, count2 = 0;
 
+// Função da thread 1
 void *leitura(void *arg) {
     FILE *file = fopen("entrada.txt", "r");
     if (!file) {
@@ -23,69 +17,78 @@ void *leitura(void *arg) {
     while (1) {
         sem_wait(&sem_buffer1_vazio);
 
-        count1 = fread(buffer1, sizeof(char), N - 1, file);
-        if (count1 <= 0) {
-            pthread_mutex_lock(&mutex);
-            leitura_concluida = 1;
-            pthread_mutex_unlock(&mutex);
-
+        if (fgets(buffer1, N, file) == NULL) {
+            buffer1[0] = EOF;  // Marca o fim do arquivo
             sem_post(&sem_buffer1_pronto);
             break;
         }
-        buffer1[count1] = '\0';
-        sem_post(&sem_buffer1_pronto);
+
+        sem_post(&sem_buffer1_pronto);  // Sinaliza que buffer1 está pronto
     }
 
     fclose(file);
     pthread_exit(NULL);
 }
 
+// Função da thread 2
 void *processamento(void *arg) {
-    int n = 0, cont = 0;
+    int input_index, output_index;
+    int bloco_contador = 0;
+    int char_contador;
 
     while (1) {
         sem_wait(&sem_buffer1_pronto);
         sem_wait(&sem_buffer2_vazio);
 
-        pthread_mutex_lock(&mutex);
-        if (leitura_concluida && count1 == 0) {
-            pthread_mutex_unlock(&mutex);
+        if (buffer1[0] == EOF) {
+            buffer2[0] = EOF;  // Marca fim de dados em buffer2
             sem_post(&sem_buffer2_pronto);
             break;
         }
-        pthread_mutex_unlock(&mutex);
 
-        for (int i = 0; i < count1; i++) {
-            buffer2[count2++] = buffer1[i];
-            cont++;
+        int buffer1_size = strlen(buffer1);
+        input_index = output_index = char_contador = 0;
 
-            if ((cont == (2 * n + 1) && n < 10) || (cont == 10 && n >= 10)) {
-                buffer2[count2++] = '\n';
-                n = (n < 10) ? n + 1 : n;
-                cont = 0;
+        // Copia dados de buffer1 para buffer2 em blocos
+        while (input_index < buffer1_size) {
+            int bloco_tamanho = (bloco_contador <= 10) ? (2 * bloco_contador + 1) : 10;
+
+            for (; char_contador < bloco_tamanho && input_index < buffer1_size; char_contador++) {
+                if (output_index < BUFFER_SIZE - 1) {
+                    buffer2[output_index++] = buffer1[input_index++];
+                } else {
+                    break;
+                }
+            }
+
+            if (char_contador == bloco_tamanho) {  // Adiciona nova linha após cada bloco
+                if (output_index < BUFFER_SIZE - 1) {
+                    buffer2[output_index++] = '\n';
+                }
+                char_contador = 0;
+                bloco_contador++;
             }
         }
-        buffer2[count2] = '\0';
+
+        buffer2[output_index] = '\0';
+        sem_post(&sem_buffer1_vazio);
         sem_post(&sem_buffer2_pronto);
     }
 
     pthread_exit(NULL);
 }
 
+// Função da thread 3
 void *impressao(void *arg) {
     while (1) {
         sem_wait(&sem_buffer2_pronto);
 
-        pthread_mutex_lock(&mutex);
-        if (leitura_concluida && buffer2[0] == '\0') {
-            pthread_mutex_unlock(&mutex);
+        if (buffer2[0] == EOF) {
             break;
         }
-        pthread_mutex_unlock(&mutex);
 
-        printf("%s", buffer2);
-        count2 = 0;
-        sem_post(&sem_buffer1_vazio);
+        printf("%s", buffer2);  // Imprime o conteúdo de buffer2
+        sem_post(&sem_buffer2_vazio);
     }
 
     pthread_exit(NULL);
